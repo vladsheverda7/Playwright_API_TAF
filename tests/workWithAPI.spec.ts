@@ -72,3 +72,42 @@ test('delete article', async ({ page, request }) => {
 
     await expect(page.locator('app-article-list h1').first()).not.toContainText('Test article title');
 });
+
+test('delete article via API', async ({ request }) => {
+    const response = await request.post('https://conduit-api.bondaracademy.com/api/users/login', {
+        data: {
+            user: {
+                email: 'vs_test@gmail.com',
+                password: 'passworD1!2!3!',
+            },
+        },
+    });
+
+    const responseBody = await response.json();
+    const accessToken = responseBody.user.token;
+
+    const articleResponse = await request.post('https://conduit-api.bondaracademy.com/api/articles/', {
+        data: {
+            article: {
+                title: 'Test article title',
+                description: 'test article description',
+                body: 'test article body',
+                tagList: [],
+            },
+        },
+        headers: {
+            authorization: `Token ${accessToken}`,
+        },
+    });
+
+    const createdArticle = await articleResponse.json();
+    const articleSlug = createdArticle.article.slug;
+
+    const deteleArticleResponse = await request.delete(`https://conduit-api.bondaracademy.com/api/articles/${articleSlug}`, {
+        headers: {
+            authorization: `Token ${accessToken}`,
+        },
+    });
+
+    expect(deteleArticleResponse.status()).toEqual(204);
+});
