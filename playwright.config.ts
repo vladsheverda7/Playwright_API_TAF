@@ -37,6 +37,9 @@ export default defineConfig({
         trace: 'on',
         //actionTimeout: 5000,
         //navigationTimeout: 5000,
+        extraHTTPHeaders: {
+            authorization: `Token ${process.env.ACCESS_TOKEN}`,
+        },
     },
 
     /* Configure projects for major browsers */
